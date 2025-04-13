@@ -3,6 +3,9 @@ package server
 import (
 	"fmt"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func ServerSetup() {
@@ -12,13 +15,22 @@ func ServerSetup() {
 		fmt.Println("Error:", err)
 		return
 	}
-	defer listener.Close()
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			fmt.Println("Error accepting connection:", err)
-			continue
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				fmt.Println("Error accepting connection:", err)
+				continue
+			}
+			go handleConnection(conn)
 		}
-		go handleConnection(conn)
-	}
+	}()
+	<-stop
+	fmt.Println("\nShutting down server...")
+
+	// Close the listener before exiting
+	listener.Close()
+	fmt.Println("Server closed.")
 }
