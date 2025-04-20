@@ -1,4 +1,4 @@
-package models
+package store
 
 type StringCache struct {
 	cache map[string]string 

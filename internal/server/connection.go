@@ -26,6 +26,9 @@ func handleConnection(conn net.Conn) {
 			fmt.Println("Closing connection for client:", conn.RemoteAddr())
 			break
 		}
+		else {
+			
+		}
 
 		response := "Server received: " + message + "\n"
 		_, err = conn.Write([]byte(response))
