@@ -26,8 +26,6 @@ func Execute(msg string) error {
 	return handler.Execute(args);
 }
 
-
-
 func parseMessage(msg string) (name string, args []string) {
 	msg = strings.ToUpper(msg);
 	var msgArgs []string = strings.Fields(msg);

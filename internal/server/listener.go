@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -21,6 +22,9 @@ func ServerSetup() {
 		for {
 			conn, err := listener.Accept()
 			if err != nil {
+				if errors.Is(err, net.ErrClosed) {
+					return
+				}
 				fmt.Println("Error accepting connection:", err)
 				continue
 			}

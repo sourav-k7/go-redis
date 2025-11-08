@@ -1,22 +1,20 @@
 package store
 
-type StringCache struct {
-	cache map[string]string 
-}
+var cache =  make(map[string]string);
 
-func (store StringCache) Set(key string, value string) (bool, error) {
-	store.cache[key] = value
+func Set(key string, value string) (bool, error) {
+	cache[key] = value
 	return true, nil
 }
 
-func (store StringCache) Get(key string) (string, bool) {
-	value, exist := store.cache[key]
+func Get(key string) (string, bool) {
+	value, exist := cache[key]
 	if !exist {
 		return "", exist
 	}
 	return value, true
 }
 
-func (store StringCache) Delete(key string) {
-	delete(store.cache, key)
+func Delete(key string) {
+	delete(cache, key)
 }

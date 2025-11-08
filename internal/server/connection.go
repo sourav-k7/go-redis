@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	"github.com/sourav-k7/go-redis/internal/cmd"
 )
 
 func handleConnection(conn net.Conn) {
@@ -25,13 +27,13 @@ func handleConnection(conn net.Conn) {
 		if message == "exit" {
 			fmt.Println("Closing connection for client:", conn.RemoteAddr())
 			break
-		}
-		else {
-			err := cmd.Execute();
+		} else {
+			err := cmd.Execute(message);
+			fmt.Println(err);
 			//todo : incase of error return error or else return success response
 		}
 
-		//todo: edit following 
+		//todo: edit following
 		response := "Server received: " + message + "\n"
 		_, err = conn.Write([]byte(response))
 		if err != nil {
