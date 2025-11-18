@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -14,14 +15,46 @@ func main() {
 	}
 	defer conn.Close()
 
-	// Send command (with newline so the server knows the command ended)
-	fmt.Fprintf(conn, "SET TEST VALUE\n")
+	reader := bufio.NewReader(os.Stdin)
+	serverReader := bufio.NewReader(conn)
 
-	// Read server response (optional, but helps debugging)
-	response, _ := bufio.NewReader(conn).ReadString('\n')
-	fmt.Print("Server response: ", response)
+	for {
+		fmt.Print("> ")
 
-	// Keep console open if running from double-click
-	fmt.Println("Press Enter to exit")
-	bufio.NewReader(os.Stdin).ReadBytes('\n')
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Input error:", err)
+			return
+		}
+
+		line = strings.TrimSpace(line)
+
+		// If user types exit → send "exit" to server first
+		if strings.EqualFold(line, "exit") {
+			// Send exit command to server
+			fmt.Fprintf(conn, "exit\n")
+
+			// Optional: try reading server's exit response
+			resp, _ := serverReader.ReadString('\n')
+			fmt.Println(resp)
+
+			fmt.Println("Closing client.")
+			return
+		}
+
+		// Normal command
+		_, err = fmt.Fprintf(conn, line+"\n")
+		if err != nil {
+			fmt.Println("Write error:", err)
+			return
+		}
+
+		response, err := serverReader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Server closed connection:", err)
+			return
+		}
+		response = strings.TrimRight(response, "\r\n")
+		fmt.Println(response)
+	}
 }

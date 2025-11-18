@@ -8,6 +8,9 @@ func Set(key string, value string) (bool, error) {
 }
 
 func Get(key string) (string, bool) {
+	if key == "" {
+		return "", false
+	}
 	value, exist := cache[key]
 	if !exist {
 		return "", exist

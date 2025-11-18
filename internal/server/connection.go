@@ -28,17 +28,35 @@ func handleConnection(conn net.Conn) {
 			fmt.Println("Closing connection for client:", conn.RemoteAddr())
 			break
 		} else {
-			err := cmd.Execute(message);
-			fmt.Println(err);
-			//todo : incase of error return error or else return success response
-		}
+			cmdRes, err := cmd.Execute(message)
 
-		//todo: edit following
-		response := "Server received: " + message + "\n"
-		_, err = conn.Write([]byte(response))
-		if err != nil {
-			fmt.Println("Error sending response:", err)
-			break
+			if err != nil {
+				// Send error message + CRLF
+				resp := err.Error() + "\r\n"
+				if _, e := conn.Write([]byte(resp)); e != nil {
+					fmt.Println("Error sending error response:", e)
+				}
+				continue
+			}
+
+			// Handle successful response
+			switch v := cmdRes.(type) {
+
+			case string:
+				// If it's a string, just send it + CRLF
+				resp := v + "\r\n"
+				if _, e := conn.Write([]byte(resp)); e != nil {
+					fmt.Println("Error sending response to", conn.RemoteAddr(), ":", e)
+				}
+
+			default:
+				// Any other type → fallback string
+				resp := "Not handled response type\r\n"
+				if _, e := conn.Write([]byte(resp)); e != nil {
+					fmt.Println("Error sending fallback response:", e)
+				}
+			}
+
 		}
 	}
 }

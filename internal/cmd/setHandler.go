@@ -6,17 +6,17 @@ import (
 	"github.com/sourav-k7/go-redis/internal/store"
 )
 
-type StringHandler struct{}
+type SetHandler struct{}
 
-func (s *StringHandler) Execute(args []string) error {
+func (s *SetHandler) Execute(args []string) (any, error) {
 	if len(args) < 2 {
-		return fmt.Errorf("SET requires key and value")
+		return nil,fmt.Errorf("SET requires key and value")
 	}
 	store.Set(args[0],args[1]);
-	fmt.Printf("[StringHandler] %s = %s\n", args[0], args[1])
-	return nil
+	fmt.Printf("[SetHandler] %s = %s\n", args[0], args[1])
+	return "OK",nil
 }
 
 func init() {
-	Register("SET", &StringHandler{})
+	Register("SET", &SetHandler{})
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type CommandHandler interface {
-	Execute(args []string) error
+	Execute(args []string) (any,error)
 }
 
 var registry = make(map[string]CommandHandler)
@@ -17,11 +17,11 @@ func Register(name string, handler CommandHandler){
 	log.Printf("Registered command: %s", name);
 }
 
-func Execute(msg string) error {
+func Execute(msg string) (any,error) {
 	name , args := parseMessage(msg);
 	handler , ok := registry[name];
 	if !ok {
-		return fmt.Errorf("unknown command: %s", name);
+		return nil,fmt.Errorf("unknown command: %s", name);
 	}
 	return handler.Execute(args);
 }
